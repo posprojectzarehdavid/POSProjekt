@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<EditTextPreference android:key="range"
+    android:title="Range"
+    android:defaultValue="500"
+    android:summary="The range in which the places will appear">
+</EditTextPreference>
+</PreferenceScreen>
