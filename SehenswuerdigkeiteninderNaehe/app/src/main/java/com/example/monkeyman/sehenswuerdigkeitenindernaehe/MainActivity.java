@@ -1,7 +1,13 @@
 package com.example.monkeyman.sehenswuerdigkeitenindernaehe;
 
+import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,37 +30,89 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LocationListener {
     ListView lv;
     ArrayList place_data;
     ArrayAdapter adapter;
+    LocationManager manager;
+    double latitude, longitude;
+    Location location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initialize();
-        new HttpGetTask().execute();
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1,place_data);
+        new HttpGetTask().execute(latitude,longitude);
+        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, place_data);
         lv.setAdapter(adapter);
 
     }
 
     private void initialize() {
         place_data = new ArrayList();
-        lv = (ListView)findViewById(R.id.listView);
+        lv = (ListView) findViewById(R.id.listView);
+        manager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
     }
 
-    class HttpGetTask extends AsyncTask<Void, Void, ArrayList<Place>> {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 100, this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        manager.removeUpdates(this);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if (location == null) return;
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        new HttpGetTask().execute(latitude,longitude);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    class HttpGetTask extends AsyncTask<Double, Void, ArrayList<Place>> {
 
         private ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
 
         private static final String MY_URL = "https://api.themoviedb.org/3/list/5316bbcd92514158d20015b5?api_key=4a93cc5ebfaa6555f836661d5f57ad60";
         private static final String URL = "https://maps.googleapis.com/maps/api/place/details/json?location=-33.8670522,151.1957362&radius=500&key=AIzaSyAJrFjbRJUQ-pS0rPmm13hYNnbxcxcTsNg";
-        private static final String URL_NEARBY = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=500&key=AIzaSyDGGz7Sj364SNYOI5eHQXFv9w5TG5-Jez0";
+        private String URL_NEARBY;
 
         @Override
-        protected ArrayList<Place> doInBackground(Void... params) {
+        protected ArrayList<Place> doInBackground(Double... params) {
+            URL_NEARBY = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+params[0]+","+params[1]+"&radius=500&key=AIzaSyDGGz7Sj364SNYOI5eHQXFv9w5TG5-Jez0";
             String data = "";
             ArrayList<Place> places = new ArrayList<>();
             HttpURLConnection httpURLConnection = null;
