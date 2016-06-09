@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         initialize();
         new HttpGetTask().execute();
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1,place_data);
+        lv.setAdapter(adapter);
 
     }
 
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected ArrayList<Place> doInBackground(Void... params) {
             String data = "";
-            ArrayList<Place> places = null;
+            ArrayList<Place> places = new ArrayList<>();
             HttpURLConnection httpURLConnection = null;
             try {
                 httpURLConnection = (HttpURLConnection)new URL(URL_NEARBY).openConnection();
@@ -103,6 +104,10 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(ArrayList<Place> places) {
             progressDialog.dismiss();
             place_data.addAll(places);
+            Log.i("hallo",place_data.size()+"");
+            for(int i = 0; i<place_data.size(); i++){
+                Log.i("hallo",place_data.get(i).toString());
+            }
             super.onPostExecute(places);
         }
 
