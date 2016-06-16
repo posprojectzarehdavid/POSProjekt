@@ -1,11 +1,12 @@
 package com.example.monkeyman.sehenswuerdigkeitenindernaehe;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-public class Details extends AppCompatActivity {
+public class Details extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

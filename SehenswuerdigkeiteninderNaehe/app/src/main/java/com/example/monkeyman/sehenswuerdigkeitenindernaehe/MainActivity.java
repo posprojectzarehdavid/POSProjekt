@@ -11,9 +11,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +26,6 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -38,7 +36,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class MainActivity extends Activity implements LocationListener {
     ListView lv;
@@ -56,6 +53,7 @@ public class MainActivity extends Activity implements LocationListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initialize();
+
         new HttpGetTask().execute(latitude, longitude);
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, place_data);
         lv.setAdapter(adapter);
@@ -77,8 +75,8 @@ public class MainActivity extends Activity implements LocationListener {
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                String val = sharedPreferences.getString(key,"");
-                String msg = key+" wurde auf "+val+" gesetzt!";
+                String val = sharedPreferences.getString(key, "");
+                String msg = key + " wurde auf " + val + " gesetzt!";
                 Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
             }
         };
@@ -86,14 +84,26 @@ public class MainActivity extends Activity implements LocationListener {
         radius = Integer.parseInt(prefs.getString("radius", "500"));
         place_data = new ArrayList();
         lv = (ListView) findViewById(R.id.listView);
+
         manager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
             return;
         }
+        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, this);
         location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if(location == null){
-           onResume();
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        if (location == null) {
+            onResume();
         }
+
 
     }
 
@@ -107,8 +117,8 @@ public class MainActivity extends Activity implements LocationListener {
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.action_settings){
-            startActivity(new Intent(this,PrefsActivity.class));
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(this, PrefsActivity.class));
             return true;
         }
         return super.onMenuItemSelected(featureId, item);
@@ -117,20 +127,35 @@ public class MainActivity extends Activity implements LocationListener {
     @Override
     protected void onResume() {
         super.onResume();
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 100, this);
+        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, this);
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         manager.removeUpdates(this);
+
     }
 
     @Override
@@ -166,7 +191,8 @@ public class MainActivity extends Activity implements LocationListener {
 
         @Override
         protected ArrayList<Place> doInBackground(Double... params) {
-            URL_NEARBY = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=16.37,48.209&radius=500&key=AIzaSyDGGz7Sj364SNYOI5eHQXFv9w5TG5-Jez0";
+            URL_NEARBY = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=48.235216,13.836252&radius=500&key=AIzaSyDGGz7Sj364SNYOI5eHQXFv9w5TG5-Jez0";
+            Log.i("Hallo",URL_NEARBY);
             String data = "";
             ArrayList<Place> places = new ArrayList<>();
             HttpURLConnection httpURLConnection = null;
@@ -216,10 +242,11 @@ public class MainActivity extends Activity implements LocationListener {
         protected void onPostExecute(ArrayList<Place> places) {
             progressDialog.dismiss();
             place_data.addAll(places);
-            Log.i("hallo",place_data.size()+"");
+            Log.i("hey",place_data.size()+"");
             for(int i = 0; i<place_data.size(); i++){
-                Log.i("hallo",place_data.get(i).toString());
+                Log.i("hey",place_data.get(i).toString());
             }
+            adapter.notifyDataSetChanged();
             super.onPostExecute(places);
         }
 
