@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-<EditTextPreference android:key="range"
-    android:title="Range"
+<EditTextPreference android:key="Radius"
+    android:title="Radius"
     android:defaultValue="500"
-    android:summary="The range in which the places will appear">
+    android:summary="Geben Sie den Radius ein"
+    android:inputType="number">
 </EditTextPreference>
 </PreferenceScreen>
