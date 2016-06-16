@@ -4,16 +4,21 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 public class Details extends Activity {
-
+    Place p;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
         Intent intent = getIntent();
-        Place p = (Place)intent.getSerializableExtra("place");
+        Bundle params = intent.getExtras();
+        p = null;
+        if(params != null){
+            p = (Place)params.get("Place");
+        }
         fillDetails(p);
     }
 
@@ -32,7 +37,13 @@ public class Details extends Activity {
         }
         types.setText(typesString.substring(2));
         longitude.setText(p.longitude+"");
-        latitude.setText(p.latitude+"");
+        latitude.setText(p.latitude + "");
 
+    }
+
+    public void openMap(View view){
+        Intent intent = new Intent(getApplicationContext(), Karte.class);
+        intent.putExtra("Place", p);
+        startActivity(intent);
     }
 }

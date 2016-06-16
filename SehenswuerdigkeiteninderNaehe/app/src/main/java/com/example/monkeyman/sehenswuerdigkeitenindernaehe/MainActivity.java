@@ -10,7 +10,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -73,7 +72,7 @@ public class MainActivity extends Activity implements LocationListener {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Place p = place_data.get(position);
                 Intent intent = new Intent(getApplicationContext(), Details.class);
-                intent.putExtra("place", p);
+                intent.putExtra("Place", p);
                 startActivity(intent);
             }
         });
@@ -97,13 +96,7 @@ public class MainActivity extends Activity implements LocationListener {
         lv = (ListView) findViewById(R.id.listView);
 
         manager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED) {
-            //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-              //      PERMISSIONS_REQUEST_GPS_ACCESS);
-            return;
-        }
-        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, this);
+        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, radius, this);
         location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         latitude = location.getLatitude();
         longitude = location.getLongitude();
@@ -135,17 +128,7 @@ public class MainActivity extends Activity implements LocationListener {
     @Override
     protected void onResume() {
         super.onResume();
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ActivityCompat.checkSelfPermission
-                (this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_GPS_ACCESS);
-
-        } else {
-            manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, this);
-        }*/
-
+        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, radius, this);
     }
 
     /*@Override
@@ -163,17 +146,7 @@ public class MainActivity extends Activity implements LocationListener {
     @Override
     protected void onPause() {
         super.onPause();
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ActivityCompat.checkSelfPermission
-                (this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_GPS_ACCESS);
-
-        } else {
-            manager.removeUpdates(this);
-        }*/
-
+        manager.removeUpdates(this);
     }
 
     @Override

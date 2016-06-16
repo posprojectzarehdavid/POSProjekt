@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Orte in der Nähe</string>
+    <string name="anzeigen"><u>Auf Karte anzeigen</u></string>
 </resources>

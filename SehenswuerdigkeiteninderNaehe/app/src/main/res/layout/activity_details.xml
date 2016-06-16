@@ -56,4 +56,16 @@
             android:layout_weight="1"
             />
     </TableRow>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/anzeigen"
+        android:id="@+id/textViewLink"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/textViewAlt"
+        android:layout_marginTop="20dp"
+        android:textColor="@android:color/holo_blue_dark"
+        android:onClick="openMap"/>
 </TableLayout>
