@@ -97,23 +97,19 @@ public class MainActivity extends Activity implements LocationListener {
         lv = (ListView) findViewById(R.id.listView);
 
         manager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED) {
+            //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+              //      PERMISSIONS_REQUEST_GPS_ACCESS);
             return;
         }
         manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, this);
         location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         latitude = location.getLatitude();
         longitude = location.getLongitude();
-            if (location == null) {
-                onResume();
-            }
+        if (location == null) {
+            onResume();
+        }
 
 
 
@@ -156,7 +152,7 @@ public class MainActivity extends Activity implements LocationListener {
     public void onRequestPermissionsResult(int requestCode, String[] permissions,int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_GPS_ACCESS) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //new HttpGetTask().execute(latitude,longitude);
+                new HttpGetTask().execute(latitude,longitude);
             } else {
                 Toast.makeText(this, "Until you grant the permission, we canot display the names",
                         Toast.LENGTH_SHORT).show();
@@ -236,13 +232,23 @@ public class MainActivity extends Activity implements LocationListener {
                         double longitude = location.getDouble("lng");
                         String icon = object.getString("icon");
                         String name = object.getString("name");
+                        JSONArray photosArray = object.optJSONArray("photos");
+                        String[] pictureLinks = null;
+                        if(photosArray != null) {
+                            pictureLinks = new String[photosArray.length()];
+                            for (int j = 0; j < photosArray.length(); j++) {
+                                JSONObject photosObject = photosArray.getJSONObject(j);
+                                JSONArray html_attributes = photosObject.getJSONArray("html_attributions");
+                                pictureLinks[j] = html_attributes.getString(0);
+                            }
+                        }
                         JSONArray typ = object.getJSONArray("types");
                         String []types = new String[typ.length()];
                         for(int j = 0; j<typ.length(); j++){
                             types[j]=typ.getString(j);
                         }
                         String vicinity = object.getString("vicinity");
-                        Place p = new Place(latitude,longitude,name,icon,vicinity,types);
+                        Place p = new Place(latitude,longitude,name,icon,pictureLinks,vicinity,types);
                         places.add(p);
                     }
                 } catch (JSONException e) {

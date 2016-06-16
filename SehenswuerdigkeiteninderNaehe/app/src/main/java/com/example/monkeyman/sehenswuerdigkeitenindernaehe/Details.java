@@ -30,7 +30,7 @@ public class Details extends Activity {
         for (int i = 0; i < p.types.length; i++) {
             typesString+=", "+p.types[i];
         }
-        types.setText(typesString);
+        types.setText(typesString.substring(2));
         longitude.setText(p.longitude+"");
         latitude.setText(p.latitude+"");
 
