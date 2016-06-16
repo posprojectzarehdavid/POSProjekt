@@ -10,6 +10,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -47,13 +48,22 @@ public class MainActivity extends Activity implements LocationListener {
     int radius;
     SharedPreferences prefs;
     SharedPreferences.OnSharedPreferenceChangeListener listener;
+    private static final int PERMISSIONS_REQUEST_GPS_ACCESS = 100;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initialize();
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ActivityCompat.checkSelfPermission
+                (this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_GPS_ACCESS);
 
+        } else {*/
+        initialize();
         new HttpGetTask().execute(latitude, longitude);
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, place_data);
         lv.setAdapter(adapter);
@@ -67,8 +77,9 @@ public class MainActivity extends Activity implements LocationListener {
                 startActivity(intent);
             }
         });
-
+        //}
     }
+
 
     private void initialize() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -100,9 +111,10 @@ public class MainActivity extends Activity implements LocationListener {
         location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         latitude = location.getLatitude();
         longitude = location.getLongitude();
-        if (location == null) {
-            onResume();
-        }
+            if (location == null) {
+                onResume();
+            }
+
 
 
     }
@@ -127,34 +139,44 @@ public class MainActivity extends Activity implements LocationListener {
     @Override
     protected void onResume() {
         super.onResume();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, this);
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ActivityCompat.checkSelfPermission
+                (this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_GPS_ACCESS);
+
+        } else {
+            manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, this);
+        }*/
 
     }
+
+    /*@Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_GPS_ACCESS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //new HttpGetTask().execute(latitude,longitude);
+            } else {
+                Toast.makeText(this, "Until you grant the permission, we canot display the names",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }*/
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        manager.removeUpdates(this);
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ActivityCompat.checkSelfPermission
+                (this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_GPS_ACCESS);
+
+        } else {
+            manager.removeUpdates(this);
+        }*/
 
     }
 
