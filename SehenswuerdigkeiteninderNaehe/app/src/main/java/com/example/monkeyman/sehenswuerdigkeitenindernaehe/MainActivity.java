@@ -42,9 +42,8 @@ public class MainActivity extends Activity implements LocationListener {
     ArrayList<Place> place_data;
     ArrayAdapter adapter;
     LocationManager manager;
-    double latitude, longitude;
+    Parameter parameter;
     Location location;
-    int radius;
     SharedPreferences prefs;
     SharedPreferences.OnSharedPreferenceChangeListener listener;
     private static final int PERMISSIONS_REQUEST_GPS_ACCESS = 100;
@@ -63,7 +62,8 @@ public class MainActivity extends Activity implements LocationListener {
 
         } else {*/
         initialize();
-        new HttpGetTask().execute(latitude, longitude);
+        Log.i("ich bin hier", "");
+        new HttpGetTask().execute(parameter);
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, place_data);
         lv.setAdapter(adapter);
 
@@ -81,25 +81,27 @@ public class MainActivity extends Activity implements LocationListener {
 
 
     private void initialize() {
+        parameter = new Parameter();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 String val = sharedPreferences.getString(key, "");
                 String msg = key + " wurde auf " + val + " gesetzt!";
+                parameter.setRadius(Integer.parseInt(prefs.getString("Radius", "500")));
                 Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(listener);
-        radius = Integer.parseInt(prefs.getString("radius", "500"));
+        parameter.setRadius(Integer.parseInt(prefs.getString("Radius", "500")));
         place_data = new ArrayList();
         lv = (ListView) findViewById(R.id.listView);
 
         manager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, radius, this);
+        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, parameter.radius, this);
         location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
+        parameter.setLatitude(location.getLatitude());
+        parameter.setLongitude(location.getLongitude());
         if (location == null) {
             onResume();
         }
@@ -128,7 +130,8 @@ public class MainActivity extends Activity implements LocationListener {
     @Override
     protected void onResume() {
         super.onResume();
-        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, radius, this);
+        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, parameter.getRadius(), this);
+        new HttpGetTask().execute(parameter);
     }
 
     /*@Override
@@ -152,9 +155,9 @@ public class MainActivity extends Activity implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         if (location == null) return;
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
-        new HttpGetTask().execute(latitude,longitude);
+        parameter.setLatitude(location.getLatitude());
+        parameter.setLongitude(location.getLongitude());
+        new HttpGetTask().execute(parameter);
     }
 
     @Override
@@ -172,7 +175,7 @@ public class MainActivity extends Activity implements LocationListener {
 
     }
 
-    class HttpGetTask extends AsyncTask<Double, Void, ArrayList<Place>> {
+    class HttpGetTask extends AsyncTask<Parameter, Void, ArrayList<Place>> {
 
         private ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
 
@@ -181,8 +184,11 @@ public class MainActivity extends Activity implements LocationListener {
         private String URL_NEARBY;
 
         @Override
-        protected ArrayList<Place> doInBackground(Double... params) {
-            URL_NEARBY = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=48.235216,13.836252&radius=500&key=AIzaSyDGGz7Sj364SNYOI5eHQXFv9w5TG5-Jez0";
+        protected ArrayList<Place> doInBackground(Parameter... params) {
+            Parameter parameter = params[0];
+            URL_NEARBY = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+
+                    parameter.getLatitude()+","+parameter.getLongitude()+"&radius="+parameter.getRadius()+
+                    "&key=AIzaSyDGGz7Sj364SNYOI5eHQXFv9w5TG5-Jez0";
             Log.i("Hallo",URL_NEARBY);
             String data = "";
             ArrayList<Place> places = new ArrayList<>();
@@ -242,6 +248,7 @@ public class MainActivity extends Activity implements LocationListener {
         @Override
         protected void onPostExecute(ArrayList<Place> places) {
             progressDialog.dismiss();
+            place_data.clear();
             place_data.addAll(places);
             Log.i("hey",place_data.size()+"");
             for(int i = 0; i<place_data.size(); i++){
