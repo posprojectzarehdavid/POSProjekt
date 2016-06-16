@@ -2,6 +2,7 @@ package com.example.monkeyman.sehenswuerdigkeitenindernaehe;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -11,6 +12,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -32,7 +35,7 @@ import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
     ListView lv;
-    ArrayList place_data;
+    ArrayList<Place> place_data;
     ArrayAdapter adapter;
     LocationManager manager;
     double latitude, longitude;
@@ -43,9 +46,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initialize();
-        new HttpGetTask().execute(latitude,longitude);
+        new HttpGetTask().execute(latitude, longitude);
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, place_data);
         lv.setAdapter(adapter);
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Place p = place_data.get(position);
+                Intent intent = new Intent(getApplicationContext(), Details.class);
+                intent.putExtra("place", p);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -57,8 +70,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             return;
         }
         location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
+        if(location == null){
+           onResume();
+        }
+
     }
 
     @Override

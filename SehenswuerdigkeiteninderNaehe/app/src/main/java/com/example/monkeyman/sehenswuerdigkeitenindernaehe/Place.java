@@ -1,9 +1,11 @@
 package com.example.monkeyman.sehenswuerdigkeitenindernaehe;
 
+import java.io.Serializable;
+
 /**
  * Created by MonkeyMan on 09.06.2016.
  */
-public class Place {
+public class Place implements Serializable {
     double latitude;
     double longitude;
     String name;
