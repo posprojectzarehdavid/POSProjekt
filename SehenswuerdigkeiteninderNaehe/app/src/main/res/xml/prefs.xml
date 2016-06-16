@@ -6,4 +6,8 @@
     android:summary="Geben Sie den Radius ein"
     android:inputType="number">
 </EditTextPreference>
+    <MultiSelectListPreference android:key="filter"
+        android:title="Filter"
+        android:entries="@array/placetypes">
+    </MultiSelectListPreference>
 </PreferenceScreen>

@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class Place implements Serializable {
     double latitude;
     double longitude;
+    int value; // 1 --> in Filter; 0 --> nicht in Filter
     String name;
     String iconLink;
     String address;
@@ -20,6 +21,39 @@ public class Place implements Serializable {
         this.iconLink = iconLink;
         this.address = address;
         this.types = types;
+        this.value = 0;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getIconLink() {
+        return iconLink;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String[] getTypes() {
+        return types;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
     }
 
     @Override
