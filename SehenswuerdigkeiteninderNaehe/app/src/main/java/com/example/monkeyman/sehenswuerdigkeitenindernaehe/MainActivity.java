@@ -62,7 +62,6 @@ public class MainActivity extends Activity implements LocationListener {
 
         } else {*/
         initialize();
-        Log.i("ich bin hier", "");
         new HttpGetTask().execute(parameter);
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, place_data);
         lv.setAdapter(adapter);
@@ -105,9 +104,6 @@ public class MainActivity extends Activity implements LocationListener {
         if (location == null) {
             onResume();
         }
-
-
-
     }
 
     @Override
