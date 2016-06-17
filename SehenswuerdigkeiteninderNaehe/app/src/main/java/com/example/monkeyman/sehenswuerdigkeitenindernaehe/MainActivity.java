@@ -99,10 +99,11 @@ public class MainActivity extends Activity implements LocationListener {
         manager = (LocationManager) getSystemService(LOCATION_SERVICE);
         manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, parameter.radius, this);
         location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        parameter.setLatitude(location.getLatitude());
-        parameter.setLongitude(location.getLongitude());
         if (location == null) {
             onResume();
+        } else{
+            parameter.setLatitude(location.getLatitude());
+            parameter.setLongitude(location.getLongitude());
         }
     }
 

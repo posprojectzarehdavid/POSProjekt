@@ -37,7 +37,7 @@ public class Karte extends FragmentActivity implements OnMapReadyCallback{
         if (params != null) {
             p = (Place) params.get("Place");
         }
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        MapFragment mapFragment = (MapFragment)getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
