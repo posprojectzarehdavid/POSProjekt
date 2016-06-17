@@ -1,18 +1,15 @@
 package com.example.monkeyman.sehenswuerdigkeitenindernaehe;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -101,7 +98,7 @@ public class MainActivity extends Activity implements LocationListener {
         location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (location == null) {
             onResume();
-        } else{
+        } else {
             parameter.setLatitude(location.getLatitude());
             parameter.setLongitude(location.getLongitude());
         }
@@ -176,31 +173,36 @@ public class MainActivity extends Activity implements LocationListener {
 
         private ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
 
-        private static final String MY_URL = "https://api.themoviedb.org/3/list/5316bbcd92514158d20015b5?api_key=4a93cc5ebfaa6555f836661d5f57ad60";
         private static final String URL = "https://maps.googleapis.com/maps/api/place/details/json?location=-33.8670522,151.1957362&radius=500&key=AIzaSyAJrFjbRJUQ-pS0rPmm13hYNnbxcxcTsNg";
         private String URL_NEARBY;
 
         @Override
         protected ArrayList<Place> doInBackground(Parameter... params) {
             Parameter parameter = params[0];
-            URL_NEARBY = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+
-                    parameter.getLatitude()+","+parameter.getLongitude()+"&radius="+parameter.getRadius()+
+            URL_NEARBY = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
+                    parameter.getLatitude() + "," + parameter.getLongitude() + "&radius=" + parameter.getRadius() +
                     "&key=AIzaSyDGGz7Sj364SNYOI5eHQXFv9w5TG5-Jez0";
-            Log.i("Hallo",URL_NEARBY);
+            Log.i("meineurl", URL_NEARBY);
             String data = "";
             ArrayList<Place> places = new ArrayList<>();
             HttpURLConnection httpURLConnection = null;
             try {
-                httpURLConnection = (HttpURLConnection)new URL(URL_NEARBY).openConnection();
+                httpURLConnection = (HttpURLConnection) new URL(URL_NEARBY).openConnection();
+                httpURLConnection.setAllowUserInteraction(false);
+                httpURLConnection.setInstanceFollowRedirects(true);
+                httpURLConnection.setRequestMethod("GET");
+                httpURLConnection.connect();
+
                 InputStream in = new BufferedInputStream(httpURLConnection.getInputStream());
                 data = readStream(in);
+                Log.i("daten", data);
                 JSONObject json = null;
 
                 try {
                     json = new JSONObject(data);
                     JSONArray place_data = json.getJSONArray("results");
 
-                    for(int i = 0 ; i<place_data.length(); i++){
+                    for (int i = 0; i < place_data.length(); i++) {
                         JSONObject object = place_data.getJSONObject(i);
                         JSONObject geometry = object.getJSONObject("geometry");
                         JSONObject location = geometry.getJSONObject("location");
@@ -210,7 +212,7 @@ public class MainActivity extends Activity implements LocationListener {
                         String name = object.getString("name");
                         JSONArray photosArray = object.optJSONArray("photos");
                         String[] pictureLinks = null;
-                        if(photosArray != null) {
+                        if (photosArray != null) {
                             pictureLinks = new String[photosArray.length()];
                             for (int j = 0; j < photosArray.length(); j++) {
                                 JSONObject photosObject = photosArray.getJSONObject(j);
@@ -219,23 +221,26 @@ public class MainActivity extends Activity implements LocationListener {
                             }
                         }
                         JSONArray typ = object.getJSONArray("types");
-                        String []types = new String[typ.length()];
-                        for(int j = 0; j<typ.length(); j++){
-                            types[j]=typ.getString(j);
+                        String[] types = new String[typ.length()];
+                        for (int j = 0; j < typ.length(); j++) {
+                            types[j] = typ.getString(j);
                         }
                         String vicinity = object.getString("vicinity");
-                        Place p = new Place(latitude,longitude,name,icon,pictureLinks,vicinity,types);
+                        Place p = new Place(latitude, longitude, name, icon, pictureLinks, vicinity, types);
+                        Log.i("place", p.toString());
                         places.add(p);
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    Log.i("abc", e.getLocalizedMessage());
                 }
             } catch (MalformedURLException e) {
-                e.printStackTrace();
+                Log.i("abc", e.getLocalizedMessage());
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.i("abc", e.getLocalizedMessage());
+            } catch (Exception e) {
+                Log.i("abc", e.getLocalizedMessage());
             } finally {
-                if(null!=httpURLConnection){
+                if (null != httpURLConnection) {
                     httpURLConnection.disconnect();
                 }
             }
@@ -247,9 +252,9 @@ public class MainActivity extends Activity implements LocationListener {
             progressDialog.dismiss();
             place_data.clear();
             place_data.addAll(places);
-            Log.i("hey",place_data.size()+"");
-            for(int i = 0; i<place_data.size(); i++){
-                Log.i("hey",place_data.get(i).toString());
+            Log.i("hey", place_data.size() + "");
+            for (int i = 0; i < place_data.size(); i++) {
+                Log.i("hey", place_data.get(i).toString());
             }
             adapter.notifyDataSetChanged();
             super.onPostExecute(places);
@@ -258,17 +263,17 @@ public class MainActivity extends Activity implements LocationListener {
         private String readStream(InputStream in) {
             BufferedReader reader = null;
             StringBuffer data = new StringBuffer("");
-            try{
+            try {
                 reader = new BufferedReader(new InputStreamReader(in));
                 String line = "";
-                while((line = reader.readLine())!=null){
+                while ((line = reader.readLine()) != null) {
                     data.append(line);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-            }finally {
-                if(reader!=null){
-                    try{
+            } finally {
+                if (reader != null) {
+                    try {
                         reader.close();
                     } catch (IOException e) {
                         e.printStackTrace();
