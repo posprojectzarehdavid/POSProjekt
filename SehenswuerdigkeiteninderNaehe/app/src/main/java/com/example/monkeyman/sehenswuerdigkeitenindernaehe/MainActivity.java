@@ -206,7 +206,6 @@ public class MainActivity extends Activity implements LocationListener {
                 try {
                     json = new JSONObject(data);
                     JSONArray place_data = json.getJSONArray("results");
-
                     for (int i = 0; i < place_data.length(); i++) {
                         JSONObject object = place_data.getJSONObject(i);
                         JSONObject geometry = object.getJSONObject("geometry");

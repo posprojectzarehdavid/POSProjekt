@@ -19,7 +19,6 @@ public class Details extends Activity {
         if(params != null){
             p = (Place)params.get("Place");
         }
-        //maps = (Maps)getFragmentManager().findFragmentById(R.id.map_fragment);
         fillDetails(p);
     }
 
@@ -29,7 +28,6 @@ public class Details extends Activity {
         TextView types = (TextView) findViewById(R.id.types);
         TextView longitude = (TextView) findViewById(R.id.longitude);
         TextView latitude = (TextView) findViewById(R.id.latitude);
-
         String typesString = "";
         name.setText(p.name);
         address.setText(p.address);
@@ -42,7 +40,6 @@ public class Details extends Activity {
     }
 
     public void showMap(View view){
-        //maps.showPlace(p);
         Intent intent = new Intent(getApplicationContext(), Karte.class);
         intent.putExtra("Place", p);
         startActivity(intent);
