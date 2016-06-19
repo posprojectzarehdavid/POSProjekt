@@ -38,4 +38,9 @@ public class Parameter {
     public void setRadius(int radius) {
         this.radius = radius;
     }
+
+    @Override
+    public String toString() {
+        return latitude + ", " +longitude + ", "+radius;
+    }
 }

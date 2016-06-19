@@ -67,5 +67,5 @@
         android:layout_below="@+id/textViewAlt"
         android:layout_marginTop="20dp"
         android:textColor="@android:color/holo_blue_dark"
-        android:onClick="openMap"/>
+        android:onClick="showMap"/>
 </TableLayout>

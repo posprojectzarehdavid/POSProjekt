@@ -62,16 +62,19 @@ public class MainActivity extends Activity implements LocationListener {
         new HttpGetTask().execute(parameter);
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, place_data);
         lv.setAdapter(adapter);
-
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Place p = place_data.get(position);
-                Intent intent = new Intent(getApplicationContext(), Details.class);
-                intent.putExtra("Place", p);
-                startActivity(intent);
-            }
-        });
+        try {
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Place p = place_data.get(position);
+                    Intent intent = new Intent(getApplicationContext(), Details.class);
+                    intent.putExtra("Place", p);
+                    startActivity(intent);
+                }
+            });
+        } catch (Exception e){
+            Log.i("fehler",e.getLocalizedMessage());
+        }
         //}
     }
 
@@ -98,9 +101,11 @@ public class MainActivity extends Activity implements LocationListener {
         location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (location == null) {
             onResume();
+            Toast.makeText(this,"Location nicht gefunden",Toast.LENGTH_SHORT).show();
         } else {
             parameter.setLatitude(location.getLatitude());
             parameter.setLongitude(location.getLongitude());
+            Toast.makeText(this,parameter.toString(),Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -2,13 +2,13 @@ package com.example.monkeyman.sehenswuerdigkeitenindernaehe;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
 public class Details extends Activity {
     Place p;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,6 +19,7 @@ public class Details extends Activity {
         if(params != null){
             p = (Place)params.get("Place");
         }
+        //maps = (Maps)getFragmentManager().findFragmentById(R.id.map_fragment);
         fillDetails(p);
     }
 
@@ -38,10 +39,10 @@ public class Details extends Activity {
         types.setText(typesString.substring(2));
         longitude.setText(p.longitude+"");
         latitude.setText(p.latitude + "");
-
     }
 
-    public void openMap(View view){
+    public void showMap(View view){
+        //maps.showPlace(p);
         Intent intent = new Intent(getApplicationContext(), Karte.class);
         intent.putExtra("Place", p);
         startActivity(intent);
