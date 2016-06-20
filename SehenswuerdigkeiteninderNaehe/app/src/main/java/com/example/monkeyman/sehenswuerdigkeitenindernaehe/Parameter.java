@@ -4,7 +4,7 @@ package com.example.monkeyman.sehenswuerdigkeitenindernaehe;
  * Created by MonkeyMan on 17.06.2016.
  */
 public class Parameter {
-    double latitude, longitude;
+    double latitude, longitude, altitude;
     int radius;
 
     public Parameter(double latitude, double longitude, int radius) {
@@ -14,6 +14,14 @@ public class Parameter {
     }
 
     public Parameter(){}
+
+    public double getAltitude() {
+        return altitude;
+    }
+
+    public void setAltitude(double altitude) {
+        this.altitude = altitude;
+    }
 
     public double getLatitude() {
         return latitude;
@@ -37,10 +45,5 @@ public class Parameter {
 
     public void setRadius(int radius) {
         this.radius = radius;
-    }
-
-    @Override
-    public String toString() {
-        return latitude + ", " +longitude + ", "+radius;
     }
 }

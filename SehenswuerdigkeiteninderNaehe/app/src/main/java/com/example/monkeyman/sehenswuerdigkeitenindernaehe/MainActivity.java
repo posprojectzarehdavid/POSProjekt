@@ -1,9 +1,13 @@
 package com.example.monkeyman.sehenswuerdigkeitenindernaehe;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -18,6 +22,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -33,6 +38,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends Activity implements LocationListener {
     ListView lv;
@@ -41,6 +48,7 @@ public class MainActivity extends Activity implements LocationListener {
     LocationManager manager;
     Parameter parameter;
     Location location;
+    Geocoder gcd;
     SharedPreferences prefs;
     SharedPreferences.OnSharedPreferenceChangeListener listener;
     private static final int PERMISSIONS_REQUEST_GPS_ACCESS = 100;
@@ -93,15 +101,15 @@ public class MainActivity extends Activity implements LocationListener {
         lv = (ListView) findViewById(R.id.listView);
 
         manager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, parameter.radius, this);
         location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        gcd = new Geocoder(getBaseContext(), Locale.getDefault());
         if (location == null) {
             onResume();
             Toast.makeText(this, "Location nicht gefunden", Toast.LENGTH_SHORT).show();
         } else {
             parameter.setLatitude(location.getLatitude());
             parameter.setLongitude(location.getLongitude());
-            Toast.makeText(this, parameter.toString(), Toast.LENGTH_SHORT).show();
+            parameter.setAltitude(location.getAltitude());
         }
     }
 
@@ -119,7 +127,64 @@ public class MainActivity extends Activity implements LocationListener {
             startActivity(new Intent(this, PrefsActivity.class));
             return true;
         }
+        if (id == R.id.action_update){
+            onResume();
+            return true;
+        }
+        if (id == R.id.action_info){
+            showLocationData();
+        }
         return super.onMenuItemSelected(featureId, item);
+    }
+
+    private void showLocationData() {
+        List<Address> addresses;
+        String [] info = new String[4];
+        try {
+            addresses = gcd.getFromLocation(parameter.getLatitude(), parameter.getLongitude(), 1);
+            if (addresses != null && addresses.size() >= 0) {
+                if(addresses.get(0).getAddressLine(0)!=null) {
+                    info[0] = addresses.get(0).getAddressLine(0);
+                } else info[0] = "Straße nicht bekannt";
+                if(addresses.get(0).getLocality()!=null) {
+                    info[1] = addresses.get(0).getLocality();
+                } else info[1] = "Ortschaft nicht bekannt";
+                if(addresses.get(0).getCountryName()!=null) {
+                    info[2] = addresses.get(0).getCountryName();
+                } else info[2] = "Land nicht bekannt";
+                if(addresses.get(0).getPostalCode()!=null) {
+                    info[3] = addresses.get(0).getPostalCode();
+                } else info[3] = "Postleitzahl nicht bekannt";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        AlertDialog.Builder ab = new AlertDialog.Builder(this);
+        ab.setTitle("Wo befinde ich mich?");
+        View v = getLayoutInflater().inflate(R.layout.info_layout,null);
+        ab.setView(v);
+        TextView strasse = (TextView) v.findViewById(R.id.textViewStr);
+        TextView plz = (TextView) v.findViewById(R.id.textViewPLZ);
+        TextView ort = (TextView) v.findViewById(R.id.textViewOrt);
+        TextView land = (TextView) v.findViewById(R.id.textViewLand);
+        TextView latitude = (TextView) v.findViewById(R.id.textViewLat);
+        TextView longitude = (TextView) v.findViewById(R.id.textViewLong);
+        TextView altitude = (TextView) v.findViewById(R.id.textViewAlt);
+
+        strasse.setText(info[0]);
+        plz.setText(info[3]);
+        ort.setText(info[1]);
+        land.setText(info[2]);
+        latitude.setText(parameter.getLatitude()+"");
+        longitude.setText(parameter.getLongitude()+"");
+        altitude.setText(parameter.getAltitude()+"");
+        ab.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        ab.create().show();
     }
 
     @Override
