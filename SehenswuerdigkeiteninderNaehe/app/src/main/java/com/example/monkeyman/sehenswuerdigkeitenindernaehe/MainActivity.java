@@ -62,19 +62,15 @@ public class MainActivity extends Activity implements LocationListener {
         new HttpGetTask().execute(parameter);
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, place_data);
         lv.setAdapter(adapter);
-        try {
-            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Place p = place_data.get(position);
-                    Intent intent = new Intent(getApplicationContext(), Details.class);
-                    intent.putExtra("Place", p);
-                    startActivity(intent);
-                }
-            });
-        } catch (Exception e){
-            Log.i("fehler",e.getLocalizedMessage());
-        }
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Place p = place_data.get(position);
+                Intent intent = new Intent(getApplicationContext(), Details.class);
+                intent.putExtra("Place", p);
+                startActivity(intent);
+            }
+        });
         //}
     }
 
@@ -101,11 +97,11 @@ public class MainActivity extends Activity implements LocationListener {
         location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (location == null) {
             onResume();
-            Toast.makeText(this,"Location nicht gefunden",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Location nicht gefunden", Toast.LENGTH_SHORT).show();
         } else {
             parameter.setLatitude(location.getLatitude());
             parameter.setLongitude(location.getLongitude());
-            Toast.makeText(this,parameter.toString(),Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, parameter.toString(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -175,10 +171,7 @@ public class MainActivity extends Activity implements LocationListener {
     }
 
     class HttpGetTask extends AsyncTask<Parameter, Void, ArrayList<Place>> {
-
         private ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-
-        private static final String URL = "https://maps.googleapis.com/maps/api/place/details/json?location=-33.8670522,151.1957362&radius=500&key=AIzaSyAJrFjbRJUQ-pS0rPmm13hYNnbxcxcTsNg";
         private String URL_NEARBY;
 
         @Override
@@ -200,7 +193,6 @@ public class MainActivity extends Activity implements LocationListener {
 
                 InputStream in = new BufferedInputStream(httpURLConnection.getInputStream());
                 data = readStream(in);
-                Log.i("daten", data);
                 JSONObject json = null;
 
                 try {
@@ -256,10 +248,6 @@ public class MainActivity extends Activity implements LocationListener {
             progressDialog.dismiss();
             place_data.clear();
             place_data.addAll(places);
-            Log.i("hey", place_data.size() + "");
-            for (int i = 0; i < place_data.size(); i++) {
-                Log.i("hey", place_data.get(i).toString());
-            }
             adapter.notifyDataSetChanged();
             super.onPostExecute(places);
         }
