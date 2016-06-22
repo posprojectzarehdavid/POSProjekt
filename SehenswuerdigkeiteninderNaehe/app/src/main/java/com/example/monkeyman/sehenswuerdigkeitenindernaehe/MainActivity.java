@@ -38,6 +38,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -70,6 +71,7 @@ public class MainActivity extends Activity implements LocationListener {
         new HttpGetTask().execute(parameter);
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, place_data);
         lv.setAdapter(adapter);
+
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -262,32 +264,22 @@ public class MainActivity extends Activity implements LocationListener {
 
                 try {
                     json = new JSONObject(data);
-                    JSONArray place_data = json.getJSONArray("results");
+                    JSONArray place_data = json.optJSONArray("results");
                     for (int i = 0; i < place_data.length(); i++) {
-                        JSONObject object = place_data.getJSONObject(i);
-                        JSONObject geometry = object.getJSONObject("geometry");
-                        JSONObject location = geometry.getJSONObject("location");
-                        double latitude = location.getDouble("lat");
-                        double longitude = location.getDouble("lng");
-                        String icon = object.getString("icon");
-                        String name = object.getString("name");
-                        JSONArray photosArray = object.optJSONArray("photos");
-                        String[] pictureLinks = null;
-                        if (photosArray != null) {
-                            pictureLinks = new String[photosArray.length()];
-                            for (int j = 0; j < photosArray.length(); j++) {
-                                JSONObject photosObject = photosArray.getJSONObject(j);
-                                JSONArray html_attributes = photosObject.getJSONArray("html_attributions");
-                                pictureLinks[j] = html_attributes.getString(0);
-                            }
-                        }
-                        JSONArray typ = object.getJSONArray("types");
+                        JSONObject object = place_data.optJSONObject(i);
+                        JSONObject geometry = object.optJSONObject("geometry");
+                        JSONObject location = geometry.optJSONObject("location");
+                        double latitude = location.optDouble("lat");
+                        double longitude = location.optDouble("lng");
+                        String icon = object.optString("icon");
+                        String name = object.optString("name");
+                        JSONArray typ = object.optJSONArray("types");
                         String[] types = new String[typ.length()];
                         for (int j = 0; j < typ.length(); j++) {
-                            types[j] = typ.getString(j);
+                            types[j] = typ.optString(j);
                         }
-                        String vicinity = object.getString("vicinity");
-                        Place p = new Place(latitude, longitude, name, icon, pictureLinks, vicinity, types);
+                        String vicinity = object.optString("vicinity");
+                        Place p = new Place(latitude, longitude, name, icon, vicinity, types);
                         Log.i("place", p.toString());
                         places.add(p);
                     }
@@ -313,6 +305,7 @@ public class MainActivity extends Activity implements LocationListener {
             progressDialog.dismiss();
             place_data.clear();
             place_data.addAll(places);
+            Collections.sort(place_data);
             adapter.notifyDataSetChanged();
             super.onPostExecute(places);
         }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+
 public class Details extends Activity {
     Place p;
 
@@ -28,15 +29,16 @@ public class Details extends Activity {
         TextView types = (TextView) findViewById(R.id.types);
         TextView longitude = (TextView) findViewById(R.id.longitude);
         TextView latitude = (TextView) findViewById(R.id.latitude);
+
         String typesString = "";
-        name.setText(p.name);
-        address.setText(p.address);
-        for (int i = 0; i < p.types.length; i++) {
-            typesString+=", "+p.types[i];
+        name.setText(p.getName());
+        address.setText(p.getAddress());
+        for (int i = 0; i < p.getTypes().length; i++) {
+            typesString+=", "+p.getTypes()[i];
         }
         types.setText(typesString.substring(2));
-        longitude.setText(p.longitude+"");
-        latitude.setText(p.latitude + "");
+        longitude.setText(p.getLongitude() + "");
+        latitude.setText(p.getLatitude() + "");
     }
 
     public void showMap(View view){

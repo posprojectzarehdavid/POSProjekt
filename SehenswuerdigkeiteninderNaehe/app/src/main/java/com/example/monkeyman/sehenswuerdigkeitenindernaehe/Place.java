@@ -5,33 +5,24 @@ import java.io.Serializable;
 /**
  * Created by MonkeyMan on 09.06.2016.
  */
-public class Place implements Serializable {
+public class Place implements Serializable, Comparable<Place> {
     double latitude;
     double longitude;
     int value; // 1 --> in Filter; 0 --> nicht in Filter
     String name;
-    String iconLink;
-    String [] pictureLinks;
+    String icon;
     String address;
     String [] types;
 
-    public Place(double latitude, double longitude, String name, String iconLink, String []pictureLinks, String address, String[] types) {
+    public Place(double latitude, double longitude, String name, String icon,
+                 String address, String[] types) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.name = name;
-        this.iconLink = iconLink;
-        this.pictureLinks = pictureLinks;
+        this.icon = icon;
         this.address = address;
         this.types = types;
         this.value = 0;
-    }
-
-    public String [] getPictureLinks() {
-        return pictureLinks;
-    }
-
-    public void setPictureLink(String [] pictureLinks) {
-        this.pictureLinks = pictureLinks;
     }
 
     public double getLatitude() {
@@ -46,8 +37,8 @@ public class Place implements Serializable {
         return name;
     }
 
-    public String getIconLink() {
-        return iconLink;
+    public String getIcon() {
+        return icon;
     }
 
     public String getAddress() {
@@ -69,5 +60,10 @@ public class Place implements Serializable {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public int compareTo(Place place) {
+        return this.name.compareTo(place.name);
     }
 }
