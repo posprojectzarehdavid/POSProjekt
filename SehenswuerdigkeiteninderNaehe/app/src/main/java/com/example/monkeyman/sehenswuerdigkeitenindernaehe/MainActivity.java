@@ -251,6 +251,7 @@ public class MainActivity extends Activity implements LocationListener {
             String data = "";
             ArrayList<Place> places = new ArrayList<>();
             HttpURLConnection httpURLConnection = null;
+            int counter = 0;
             try {
                 httpURLConnection = (HttpURLConnection) new URL(URL_NEARBY).openConnection();
                 httpURLConnection.setAllowUserInteraction(false);
